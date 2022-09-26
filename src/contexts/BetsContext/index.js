@@ -1,9 +1,12 @@
-import { createContext, useState, useEffect } from "react"
+import { createContext, useState, useEffect, useContext } from "react"
 import axios from "@/lib/axios"
+import { LoadingContext } from "../LoadingContext"
 
 export const BetsContext = createContext({})
 
 export const BetsProvider = ({children}) => {
+
+    const { setShowLoading } = useContext(LoadingContext)
 
     const [bets, setBets] = useState([])
 
@@ -21,7 +24,7 @@ export const BetsProvider = ({children}) => {
     const loadBets = async () => {
         try {
             const result = await axios.get('/api/bets')
-            setBets(result.data.data)   
+            setBets(result.data.data)
         } catch (error) {
             console.log(error)
         }
@@ -29,10 +32,14 @@ export const BetsProvider = ({children}) => {
 
     const handleAddBet = async (bet) => {
 
+        setShowLoading(true)
+
         const data = {
             "match_id": bet.id,
             "home_id": bet.homeID,
             "away_id": bet.awayID,
+            "name_home": bet.home_name,
+            "name_away": bet.away_name,
             "odd": bet.bet == "home" ? bet.odds_ft_1 : bet.bet == "away" ? bet.odds_ft_2 : bet.odds_ft_x,
             "bet": bet.bet == "home" ? bet.homeID : bet.bet == "away" ? bet.awayID : -1,
             "bet_value": bet.betValue
@@ -48,11 +55,13 @@ export const BetsProvider = ({children}) => {
             }else{
                 alert('aposta nao realizada')
             }
+            setShowLoading(false)
             
         } catch (error) {
             if( error.response.status == 422 || error.response.status == 400 ){
                 alert(error.response.data.errors.join('\n'))
             }
+            setShowLoading(false)
         }
 
     }
