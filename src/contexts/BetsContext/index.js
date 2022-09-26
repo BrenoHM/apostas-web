@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react"
 import axios from "@/lib/axios"
 import { LoadingContext } from "../LoadingContext"
+import Swal from 'sweetalert2'
 
 export const BetsContext = createContext({})
 
@@ -50,16 +51,22 @@ export const BetsProvider = ({children}) => {
             const result = await axios.post('/api/bets', data)
 
             if( result.data.success ) {
-                alert('Aposta realizada com sucesso')
                 setBets([...bets, result.data.data])
-            }else{
-                alert('aposta nao realizada')
+                Swal.fire(
+                    '',
+                    'Sua aposta foi realizada com sucesso!',
+                    'success'
+                )
             }
             setShowLoading(false)
             
         } catch (error) {
             if( error.response.status == 422 || error.response.status == 400 ){
-                alert(error.response.data.errors.join('\n'))
+                Swal.fire(
+                    'Opss',
+                    error.response.data.errors.join('\n'),
+                    'info'
+                )
             }
             setShowLoading(false)
         }

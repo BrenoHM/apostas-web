@@ -14,7 +14,7 @@ const Leagues = () => {
     }, [])
 
     const loadLeagues = async () => {
-        const result = await axios.get('/leagues')
+        const result = await axios.get('/api/leagues')
         setLeagues(result.data)
     }
 

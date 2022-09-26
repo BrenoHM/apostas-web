@@ -1,9 +1,11 @@
 import useSWR from 'swr'
 import axios from '@/lib/axios'
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
 import { useRouter } from 'next/router'
+import { LoadingContext } from '@/contexts/LoadingContext'
 
 export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
+    const { setShowLoading } = useContext(LoadingContext)
     const router = useRouter()
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
@@ -35,6 +37,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const login = async ({ setErrors, setStatus, ...props }) => {
+        setShowLoading(true)
         await csrf()
 
         setErrors([])
@@ -42,11 +45,14 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         axios
             .post('/login', props)
-            .then(() => mutate())
-            .catch(error => {
+            .then(() => {
+                mutate()
+                setShowLoading(false)
+            }).catch(error => {
                 if (error.response.status !== 422) throw error
 
                 setErrors(error.response.data.errors)
+                setShowLoading(false)
             })
     }
 

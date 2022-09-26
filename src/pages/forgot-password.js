@@ -35,9 +35,7 @@ const ForgotPassword = () => {
                 }>
 
                 <div className="mb-4 text-sm text-gray-600">
-                    Forgot your password? No problem. Just let us know your
-                    email address and we will email you a password reset link
-                    that will allow you to choose a new one.
+                    Esqueceu sua senha? Sem problemas. Basta nos informar seu endereço de e-mail e nós lhe enviaremos um link de redefinição de senha que permitirá que você escolha uma nova.
                 </div>
 
                 {/* Session Status */}
@@ -62,7 +60,7 @@ const ForgotPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-end mt-4">
-                        <Button>Email Password Reset Link</Button>
+                        <Button>Link de redefinição de senha de e-mail</Button>
                     </div>
                 </form>
             </AuthCard>

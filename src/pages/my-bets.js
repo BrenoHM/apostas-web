@@ -69,14 +69,14 @@ const MyBets = () => {
                                 </thead>
                                 <tbody>
                                     {bets.length > 0 ? bets.map(bet => (
-                                        <tr key={bet.id}>
+                                        <tr key={bet.id} className={ bet.status == 'processed' ? (bet.winning_tem == bet.bet ? 'bg-green-100' : 'bg-red-100') : 'bg-blue-100' }>
                                             <td className="border border-slate-300 p-2 text-center">{bet.id}</td>
-                                            <td className="border border-slate-300 p-2 text-center">{bet.home_id}</td>
-                                            <td className="border border-slate-300 p-2 text-center">{bet.away_id}</td>
+                                            <td className="border border-slate-300 p-2 text-center">{bet.name_home}</td>
+                                            <td className="border border-slate-300 p-2 text-center">{bet.name_away}</td>
                                             <td className="border border-slate-300 p-2 text-center">{bet.bet_value}</td>
                                             <td className="border border-slate-300 p-2 text-center">{bet.odd}</td>
                                             <td className="border border-slate-300 p-2 text-center">{(bet.bet_value * bet.odd).toFixed(2)}</td>
-                                            <td className="border border-slate-300 p-2 text-center">{bet.status}</td>
+                                            <td className="border border-slate-300 p-2 text-center">{bet.status == 'processed' ? 'Processada' : 'Aberta'}</td>
                                             <td className="border border-slate-300 p-2 text-center">{ bet.status == 'processed' ? (bet.winning_tem == bet.bet ? 'Vitória' : 'Derrota') : '' }</td>
                                             <td className="border border-slate-300 p-2 text-center">{bet.created_at}</td>
                                         </tr>
