@@ -19,7 +19,6 @@ export const BetsProvider = ({children}) => {
     }, [openBet])
 
     const loadBets = async () => {
-        console.log('load bets')
         try {
             const result = await axios.get('/api/bets')
             setBets(result.data.data)   

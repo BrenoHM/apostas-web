@@ -60,9 +60,9 @@ const Navigation = ({ user }) => {
                                 Virtuais
                             </NavLink>
                             <NavLink
-                                href="/times"
+                                href="/my-bets"
                                 active={router.pathname === '/times'}>
-                                Promoções
+                                Minhas apostas
                             </NavLink>
                         </div>
                     </div>

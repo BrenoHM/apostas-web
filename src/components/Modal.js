@@ -74,6 +74,7 @@ const Modal = () => {
               })
               .catch((error) => {
                   // lidar com a resposta de erro ao tentar criar o pagamento
+                  alert('Erro ao processar o pagamento!')
                   reject(error);
               })
             });

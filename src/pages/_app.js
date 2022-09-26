@@ -1,6 +1,7 @@
 import 'tailwindcss/tailwind.css'
 import { BetsProvider } from '@/contexts/BetsContext'
 import { useRouter } from 'next/router'
+import { LoadingProvider } from '@/contexts/LoadingContext';
 
 const App = ({ Component, pageProps }) => {
     
@@ -8,15 +9,16 @@ const App = ({ Component, pageProps }) => {
     
     return (
         <>
-        { router.pathname === '/' ? (
-            <Component {...pageProps} />
-        ): (
-            <BetsProvider>
-                <Component {...pageProps} />
-            </BetsProvider>
-        ) }
+            <LoadingProvider>
+                { router.pathname === '/' ? (
+                    <Component {...pageProps} />
+                ): (
+                    <BetsProvider>
+                        <Component {...pageProps} />
+                    </BetsProvider>
+                ) }
+            </LoadingProvider>
         </>
-        
     )    
 }
 

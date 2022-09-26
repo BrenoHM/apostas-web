@@ -1,23 +1,28 @@
 import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import axios from '@/lib/axios'
 import Match from '@/components/Match'
+import { LoadingContext } from '@/contexts/LoadingContext'
 
 const Matches = () => {
+
+    const {setShowLoading} = useContext(LoadingContext)
 
     const router = useRouter()
 
     const [matches, setMatches] = useState([])
 
     useEffect(() => {
+        setShowLoading(true)
         loadMatches()
     }, [router.query.season_id])
 
     const loadMatches = async () => {
         const result = await axios.get('/api/matches')
         setMatches(result.data)
+        setShowLoading(false)
     }
 
     return (
