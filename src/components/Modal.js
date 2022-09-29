@@ -1,11 +1,14 @@
-import { useState } from "react";
-import Button from "./Button";
-import Head from "next/head";
-import Input from "./Input";
-import axios from "@/lib/axios";
-import InputError from "./InputError";
+import { useState, useContext } from "react"
+import Button from "./Button"
+import Head from "next/head"
+import Input from "./Input"
+import axios from "@/lib/axios"
+import InputError from "./InputError"
+import Swal from 'sweetalert2'
+import { LoadingContext } from "@/contexts/LoadingContext"
 
 const Modal = () => {
+  const {setShowLoading} = useContext(LoadingContext)
   const [showModal, setShowModal] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [showLoadingForm, setShowLoadingForm] = useState(true);
@@ -13,7 +16,7 @@ const Modal = () => {
   const [showError, setShowError] = useState(false);
 
   const payment = () => {
-    if( !value ) {
+    if( !value || value <= 0 ) {
       setShowError(true)
       return
     }
@@ -27,14 +30,14 @@ const Modal = () => {
   const saveDeposit = async (data) => {
     try {
       const body = {
+        gateway_id: data.id,
         value : value,
+        method: 'credit',
         result: JSON.stringify(data),
         status: data.status
       }
       const result = await axios.post('/api/deposit', body);
-      if( result.data.success ) {
-        alert('Pagamento realizado com sucesso!')
-      }
+      setValue(0)
       setShowPayment(false)
     } catch (error) {
       console.log(error)
@@ -54,27 +57,61 @@ const Modal = () => {
       },
       callbacks: {
         onReady: () => {
-          // callback chamado quando o Brick estiver pronto
+          console.log('brick ready')
         },
         onSubmit: (cardFormData) => {
           // callback chamado o usuário clicar no botão de submissão dos dados
           // ejemplo de envío de los datos recolectados por el Brick a su servidor
+          setShowLoading(true)
           return new Promise((resolve, reject) => {
               axios.post("/process_payment", cardFormData)
               .then((response) => {
-                  // if(response.data.status == 'approved'){
-                  //   alert('Pagamento realizado com sucesso')
-                  //   //window.location.href = window.location.href
-                  // }else{
-                  //   alert(response.data.status)
-                  // }
+                  
+                setShowLoading(false)
+                if(response.data.status == 'approved'){
+                    Swal.fire(
+                      '',
+                      'Seu pagamento foi aprovado!',
+                      'success'
+                    )
+                  }else{
+                    var message = "";
+                    switch(response.data.status_detail){
+                      case 'cc_rejected_other_reason':
+                        message = "Pagamento foi recusado por erro geral!"
+                        break
+                      case 'pending_contingency':
+                        message = "Pagamento está pendente!"
+                        break
+                      case 'cc_rejected_call_for_authorize':
+                        message = "Pagamento recusado com validação para autorizar!"
+                        break
+                      case 'cc_rejected_insufficient_amount':
+                        message = "Pagamento recusado por quantia insuficiente!"
+                      case 'cc_rejected_bad_filled_security_code':
+                        message = "Pagamento recusado por código de segurança inválido!"
+                      case 'cc_rejected_bad_filled_date':
+                        message = "Pagamento recusado por problema com a data de vencimento!"
+                      case 'cc_rejected_bad_filled_other':
+                        message = "Pagamento recusado por erro no formulário!"
+                    }
+
+                    Swal.fire(
+                      'Opss!!!',
+                      message,
+                      'error'
+                    )
+                  }
+
+                  //salva de qualquer forma
                   saveDeposit(response.data)
                   // receber o resultado do pagamento
                   resolve(response);
               })
               .catch((error) => {
+                  setShowLoading(false)
                   // lidar com a resposta de erro ao tentar criar o pagamento
-                  alert('Erro ao processar o pagamento!')
+                  Swal.fire('Opss!!!','Erro ao processar o pagamento!','info')
                   reject(error);
               })
             });
@@ -92,13 +129,13 @@ const Modal = () => {
   return (
     <>
       <Head>
-        <script src="https://sdk.mercadopago.com/js/v2"></script>
+        <script src={process.env.NEXT_PUBLIC_SDK_MP}></script>
       </Head>
       <Button type="button" className="mr-2" onClick={() => setShowModal(true)}>Depositar</Button>
 
       {showModal ? (
         <>
-          <div className="w-full flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+          <div className="w-full flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-40 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none p-5">
                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t ">
@@ -125,6 +162,8 @@ const Modal = () => {
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   className="mt-5"
+                  autoFocus
+                  min="0"
                 />
                   
                 <Button
@@ -142,7 +181,7 @@ const Modal = () => {
       ) : null}
       {showPayment ? (
         <>
-        <div className="w-full flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+        <div className="w-full flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-40 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t ">

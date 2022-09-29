@@ -8,7 +8,7 @@ import { DropdownButton } from '@/components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import Modal from '../Modal'
+import { BsCashCoin } from 'react-icons/bs'
 
 const Navigation = ({ user }) => {
     const router = useRouter()
@@ -72,9 +72,7 @@ const Navigation = ({ user }) => {
 
                         { user?.amount && <span className="mr-5 bg-green-400 rounded py-1 px-2 border border-green-500" title="Seu saldo">R$ {user.amount}</span> }
 
-                        {/* <Button type="button" className="mr-2">Depositar</Button> */}
-
-                        <Modal />
+                        <Button type="button" className="mr-2" onClick={() => router.push('/deposit')}><BsCashCoin className="mr-2 text-lg" /> Depositar</Button>
 
                         <Dropdown
                             align="right"
@@ -99,11 +97,14 @@ const Navigation = ({ user }) => {
                             }>
 
                             {/* Authentication */}
-                            <DropdownButton onClick={logout}>
-                                Logout
-                            </DropdownButton>
                             <DropdownButton onClick={() => {}}>
                                 Minhas Apostas
+                            </DropdownButton>
+                            <DropdownButton onClick={() => {router.push('/deposit')}}>
+                                Depositar
+                            </DropdownButton>
+                            <DropdownButton onClick={logout}>
+                                Logout
                             </DropdownButton>
                         </Dropdown>
                     </div>

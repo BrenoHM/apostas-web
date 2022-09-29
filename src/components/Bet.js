@@ -10,7 +10,7 @@ const Bet = () => {
     const [showMessage, setShowMessage] = useState(false)
 
     const handleBet = () => {
-        if( !valueBet ) {
+        if( !valueBet || valueBet <= 0 ) {
             setShowMessage(true)
             return
         }
@@ -55,6 +55,7 @@ const Bet = () => {
                         className="mr-2 mb-2 p-1 border-black"
                         placeholder="Valor da aposta"
                         autoFocus
+                        min="0"
                     />
                     <div className="flex justify-between">
                         <span>Valor total da aposta</span>

@@ -3,6 +3,7 @@ import Head from "next/head"
 import { useState, useEffect, useContext } from "react"
 import axios from "@/lib/axios"
 import { LoadingContext } from "@/contexts/LoadingContext"
+import Input from "@/components/Input"
 
 const MyBets = () => {
 
@@ -10,14 +11,20 @@ const MyBets = () => {
     const [filter, setFilter] = useState('opened')
     const [bets, setBets] = useState([])
 
+    let defaultDate = new Date()
+    defaultDate.setDate(defaultDate.getDate() - 10)
+    const [startDate, setStartDate] = useState(defaultDate.toLocaleDateString('en-CA'))
+    
+    const [endDate, setEndDate] = useState(new Date().toLocaleDateString('en-CA'))
+
     useEffect(() => {
         setShowLoading(true)
         loadBets()
-    }, [filter])
+    }, [filter, startDate, endDate])
 
     const loadBets = async () => {
         try {
-            const result = await axios.get(`/api/bets?filter=${filter}`)
+            const result = await axios.get(`/api/bets?filter=${filter}&start=${startDate}&end=${endDate}`)
             setBets(result.data.data)
             setShowLoading(false)
         } catch (error) {
@@ -51,6 +58,21 @@ const MyBets = () => {
                                     className={`${ filter == 'processed' ? 'bg-sky-700 text-white' : '' } border rounded p-2 cursor-pointer mr-5 focus:text-white focus:bg-sky-700`}
                                     onClick={() => setFilter('processed')}
                                 >PROCESSADAS</button>
+
+                                <Input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="mr-2"
+                                    max="2999-12-31"
+                                />
+
+                                <Input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    max="2999-12-31"
+                                />
                             </div>
 
                             <table className="border-collapse border border-slate-400 w-full mt-5">

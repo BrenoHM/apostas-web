@@ -22,17 +22,22 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
+        setShowLoading(true)
         await csrf()
 
         setErrors([])
 
         axios
             .post('/register', props)
-            .then(() => mutate())
+            .then(() => {
+                mutate()
+                setShowLoading(false)
+            })
             .catch(error => {
                 if (error.response.status !== 422) throw error
 
                 setErrors(error.response.data.errors)
+                setShowLoading(false)
             })
     }
 
@@ -57,6 +62,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
+        setShowLoading(true)
         await csrf()
 
         setErrors([])
@@ -64,15 +70,20 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         axios
             .post('/forgot-password', { email })
-            .then(response => setStatus(response.data.status))
+            .then(response => {
+                setStatus(response.data.status)
+                setShowLoading(false)
+            })
             .catch(error => {
                 if (error.response.status !== 422) throw error
 
                 setErrors(error.response.data.errors)
+                setShowLoading(false)
             })
     }
 
     const resetPassword = async ({ setErrors, setStatus, ...props }) => {
+        setShowLoading(true)
         await csrf()
 
         setErrors([])
@@ -80,11 +91,15 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         axios
             .post('/reset-password', { token: router.query.token, ...props })
-            .then(response => router.push('/login?reset=' + btoa(response.data.status)))
+            .then(response => {
+                setShowLoading(false)
+                router.push('/login?reset=' + btoa(response.data.status))
+            })
             .catch(error => {
                 if (error.response.status !== 422) throw error
 
                 setErrors(error.response.data.errors)
+                setShowLoading(false)
             })
     }
 
@@ -96,9 +111,13 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const logout = async () => {
         if (! error) {
+            setShowLoading(true)
             await axios
                 .post('/logout')
-                .then(() => mutate())
+                .then(() => {
+                    mutate()
+                    setShowLoading(false)
+                })
         }
 
         window.location.pathname = '/login'
