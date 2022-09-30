@@ -27,7 +27,7 @@ export default function Home() {
 
                             <Link href="/register">
                                 <a className="ml-4 text-sm text-gray-700 underline">
-                                    Register
+                                    Registrar
                                 </a>
                             </Link>
                         </>
